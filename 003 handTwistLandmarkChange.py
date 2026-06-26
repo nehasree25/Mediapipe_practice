@@ -1,0 +1,58 @@
+import cv2
+import mediapipe as mp
+import time
+
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(
+    static_image_mode=False,
+    max_num_hands=2,
+    min_detection_confidence=0.5
+)
+mp_draw = mp.solutions.drawing_utils
+
+cap = cv2.VideoCapture(0)
+pTime = time.time()
+while True:
+    success, img = cap.read()
+
+    if not success:
+        break
+
+    cTime = time.time()
+    fps = 1 / (cTime - pTime)
+    pTime = cTime
+    cv2.putText(img, f'FPS: {int(fps)}', (20,60),
+                cv2.FONT_HERSHEY_SIMPLEX, 1,
+                (255,255,0), 2)
+
+    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = hands.process(rgb_img)
+
+    h, w, c = img.shape
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            for id, lm in enumerate(hand_landmarks.landmark):
+                if id == 0:
+                    x, y = int(lm.x * w), int(lm.y * h)
+                    cv2.circle(img, (x, y), 15, (255, 255, 0), cv2.FILLED)
+            mp_draw.draw_landmarks(
+                img,
+                hand_landmarks,
+                mp_hands.HAND_CONNECTIONS
+            )
+            cv2.putText(
+                img,
+                "Twist Landmark Change",
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (0, 255, 0),
+                2
+            )
+
+    cv2.imshow("Twist Landmark Change", img)
+    if cv2.waitKey(1) & 0xFF == 27:  # ESC key
+        break
+
+cap.release()
+cv2.destroyAllWindows()
