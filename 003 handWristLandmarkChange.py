@@ -42,7 +42,7 @@ while True:
             )
             cv2.putText(
                 img,
-                "Twist Landmark Change",
+                "Wrist Landmark Change",
                 (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.7,
@@ -50,7 +50,7 @@ while True:
                 2
             )
 
-    cv2.imshow("Twist Landmark Change", img)
+    cv2.imshow("Wrist Landmark Change", img)
     if cv2.waitKey(1) & 0xFF == 27:  # ESC key
         break
 
